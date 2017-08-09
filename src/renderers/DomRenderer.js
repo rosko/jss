@@ -87,6 +87,23 @@ const getHead = (() => {
   }
 })()
 
+const getUnescapedSelectorsMap = (() => {
+  const style = document.createElement('style')
+  const head = getHead()
+
+  return (rules) => {
+    const map = {}
+    head.appendChild(style)
+    for (let i = 0; i < rules.length; i++) {
+      const {selector} = rules[i]
+      style.textContent = `${selector} {}`
+      map[getSelector(style.sheet.cssRules[0])] = selector
+    }
+    head.removeChild(style)
+    return map
+  }
+})()
+
 /**
  * Find attached sheet with an index higher than the passed one.
  */
@@ -194,6 +211,8 @@ export default class DomRenderer {
   setSelector = setSelector
 
   getSelector = getSelector
+
+  getUnescapedSelectorsMap = getUnescapedSelectorsMap
 
   // HTMLStyleElement needs fixing https://github.com/facebook/flow/issues/2696
   element: any

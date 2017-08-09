@@ -11,8 +11,6 @@ import type {
   JssStyle
 } from './types'
 
-const style = document.createElement('style')
-
 /**
  * Contains rules objects and allows adding/removing etc.
  * Is used for e.g. by `StyleSheet` or `ConditionalRule`.
@@ -149,17 +147,10 @@ export default class RuleList {
    * Link renderable rules with CSSRuleList.
    */
   link(cssRules: CSSRuleList): void {
-    const map = {}
+    let map
 
     if (this.options.supportEscaping) {
-      document.head.appendChild(style)
-      for (let i = 0; i < this.index.length; i++) {
-        const rule = this.index[i]
-        const {selector} = rule
-        style.textContent = selector + ' {}'
-        map[this.options.sheet.renderer.getSelector(style.sheet.rules[0])] = selector
-      }
-      document.head.removeChild(style)
+      map = this.options.sheet.renderer.getUnescapedSelectorsMap(this.index)
     }
 
     for (let i = 0; i < cssRules.length; i++) {
